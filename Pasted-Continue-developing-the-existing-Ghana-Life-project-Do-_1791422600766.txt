@@ -1,0 +1,31 @@
+Continue developing the existing Ghana Life project. Do NOT rebuild the project from scratch and do NOT replace the existing App.tsx or world-map.ts unnecessarily. Preserve the current Ghana-themed low-poly 3D world, chunk-based map system, player movement, collision system, mobile controls, roads, shops, houses, Accra environment, and existing UI.
+
+Our next milestone is basic online multiplayer.
+
+Build a minimal but proper multiplayer foundation where:
+
+1. Two players can open the game from different browser sessions and connect to the same multiplayer room.
+2. Each player gets a unique player ID.
+3. The server is authoritative for player position and basic movement state.
+4. A player can see another connected player’s character in the 3D Ghana Life world.
+5. Other players’ positions and rotations update smoothly rather than appearing to teleport constantly.
+6. When a player disconnects, their character disappears for the remaining players.
+7. Display a small player count such as Players online: 2.
+8. Give each player a simple visual identifier so players can distinguish themselves.
+9. Keep the current local movement controls working on keyboard and mobile.
+10. Do not add NPC AI. The long-term design is for real players to populate the world.
+
+Architecture:
+
+* Keep the existing React + React Three Fiber + Three.js frontend.
+* Use a lightweight Node.js/TypeScript WebSocket multiplayer server if appropriate for this Replit project.
+* Keep multiplayer code separated into sensible files instead of putting everything into App.tsx.
+* Use interpolation/client smoothing for remote players.
+* Do not introduce a database yet. We only need temporary multiplayer sessions for this milestone.
+* Do not implement vehicles, jobs, money, houses, schools, inventory, or businesses yet. Those will come after the multiplayer foundation works.
+
+Important: Before making major changes, inspect the existing project files and understand the current architecture. Reuse existing movement, collision, player rendering, and world/chunk systems instead of duplicating them.
+
+Goal for this milestone: If I open the game in two browser windows, both windows should connect to the same room and I should be able to walk around the Ghana Life neighborhood while seeing the other player moving around.
+
+After implementing it, run the project and test for errors. Fix any TypeScript, React, Three.js, WebSocket, or server/runtime errors you encounter. At the end, clearly tell me which files you created/modified and how I can test two players in Replit.

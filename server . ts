@@ -1,0 +1,88 @@
+import { WebSocketServer, WebSocket } from "ws";
+import { randomUUID } from "crypto";
+
+type Player = {
+  id: string;
+  x: number;
+  y: number;
+  z: number;
+  rotation: number;
+};
+
+const players = new Map<string, Player>();
+
+const PORT = Number(process.env.PORT) || 3001;
+
+const wss = new WebSocketServer({
+  port: PORT,
+});
+
+function broadcastPlayers() {
+  const message = JSON.stringify({
+    type: "players",
+    players: Array.from(players.values()),
+  });
+
+  for (const client of wss.clients) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  }
+}
+
+wss.on("connection", (socket) => {
+  const player: Player = {
+    id: randomUUID(),
+    x: 0,
+    y: 0,
+    z: 0,
+    rotation: 0,
+  };
+
+  players.set(player.id, player);
+
+  console.log(`Player connected: ${player.id}`);
+
+  socket.send(
+    JSON.stringify({
+      type: "welcome",
+      playerId: player.id,
+    }),
+  );
+
+  broadcastPlayers();
+
+  socket.on("message", (rawMessage) => {
+    try {
+      const message = JSON.parse(rawMessage.toString());
+
+      if (message.type === "move") {
+        const currentPlayer = players.get(player.id);
+
+        if (!currentPlayer) return;
+
+        currentPlayer.x = Number(message.x) || 0;
+        currentPlayer.y = Number(message.y) || 0;
+        currentPlayer.z = Number(message.z) || 0;
+        currentPlayer.rotation = Number(message.rotation) || 0;
+
+        broadcastPlayers();
+      }
+    } catch {
+      console.log("Invalid multiplayer message received.");
+    }
+  });
+
+  socket.on("close", () => {
+    players.delete(player.id);
+    console.log(`Player disconnected: ${player.id}`);
+    broadcastPlayers();
+  });
+
+  socket.on("error", () => {
+    players.delete(player.id);
+    broadcastPlayers();
+  });
+});
+
+console.log(`Ghana Life multiplayer server running on port ${PORT}`);
